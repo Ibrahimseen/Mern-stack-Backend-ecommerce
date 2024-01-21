@@ -3,12 +3,14 @@ import mongoose from "mongoose";
 const schema = new mongoose.Schema({
   code: {
     type: String,
-    required: [true, "Please enter the Coupon Code"],
+    required: [true, "please Enter Coupon code"],
     unique: true,
   },
   amount: {
     type: Number,
-    required: [true, "Please enter the Discount Amount"],
+    required: [true, "please Enter The Discount Amount"],
+  },
+  used:{
   },
 });
 

@@ -6,7 +6,7 @@ import ErrorHandler from "../utils/utility-class.js";
 export const createPaymentIntent = TryCatch(async (req, res, next) => {
   const { amount } = req.body;
 
-  if (!amount) return next(new ErrorHandler("Please enter amount", 400));
+  if (!amount) return next(new ErrorHandler("Please Enter Amount ", 400));
 
   const paymentIntent = await stripe.paymentIntents.create({
     amount: Number(amount) * 100,
@@ -14,22 +14,22 @@ export const createPaymentIntent = TryCatch(async (req, res, next) => {
   });
 
   return res.status(201).json({
-    success: true,
+    sucess: true,
     clientSecret: paymentIntent.client_secret,
   });
 });
 
-export const newCoupon = TryCatch(async (req, res, next) => {
+export const newcoupon = TryCatch(async (req, res, next) => {
   const { coupon, amount } = req.body;
 
-  if (!coupon || !amount)
-    return next(new ErrorHandler("Please enter both coupon and amount", 400));
+  if (!amount || !coupon)
+    return next(new ErrorHandler("Please Enter Coupon Code or Amount ", 400));
 
   await Coupon.create({ code: coupon, amount });
 
   return res.status(201).json({
-    success: true,
-    message: `Coupon ${coupon} Created Successfully`,
+    sucess: true,
+    message: `Coupon Created (${coupon})  Successfuly`,
   });
 });
 
@@ -38,7 +38,16 @@ export const applyDiscount = TryCatch(async (req, res, next) => {
 
   const discount = await Coupon.findOne({ code: coupon });
 
-  if (!discount) return next(new ErrorHandler("Invalid Coupon Code", 400));
+  if (!discount) {
+    return next(new ErrorHandler("Please Enter a Valid Coupon Code", 400));
+  }
+
+  if (discount.used) {
+    return next(new ErrorHandler("This coupon has already been used", 400));
+  }
+
+  discount.used = true;
+  await discount.save();
 
   return res.status(200).json({
     success: true,
@@ -46,12 +55,16 @@ export const applyDiscount = TryCatch(async (req, res, next) => {
   });
 });
 
-export const allCoupons = TryCatch(async (req, res, next) => {
-  const coupons = await Coupon.find({});
+export const AllCoupon = TryCatch(async (req, res, next) => {
+  const coupon = await Coupon.find();
+
+  if (!coupon) {
+    return next(new ErrorHandler("Coupon does't Exist", 400));
+  }
 
   return res.status(200).json({
     success: true,
-    coupons,
+    coupon,
   });
 });
 
@@ -60,10 +73,10 @@ export const deleteCoupon = TryCatch(async (req, res, next) => {
 
   const coupon = await Coupon.findByIdAndDelete(id);
 
-  if (!coupon) return next(new ErrorHandler("Invalid Coupon ID", 400));
+  if (!coupon) return next(new ErrorHandler("Coupon does't Exist", 404));
 
   return res.status(200).json({
     success: true,
-    message: `Coupon ${coupon.code} Deleted Successfully`,
+    message: `Coupon ${coupon.code} Deleted Succesfully`,
   });
 });

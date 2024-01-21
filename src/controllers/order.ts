@@ -57,8 +57,8 @@ export const getSingleOrder = TryCatch(async (req, res, next) => {
   return res.status(200).json({
     success: true,
     order,
-  });
-});
+  }); 
+}); 
 
 export const newOrder = TryCatch(
   async (req: Request<{}, {}, NewOrderRequestBody>, res, next) => {
