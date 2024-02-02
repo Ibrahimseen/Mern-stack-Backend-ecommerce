@@ -5,11 +5,13 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node dist/app.js",
-    "build": "tsc",
-    "watch": "tsc -w",
-    "dev": "nodemon dist/app.js"
-  },
+  "start": "node dist/app.js",
+  "build": "tsc",
+  "watch": "tsc -w",
+  "dev": "nodemon dist/app.js",
+  "deploy": "vercel --prod",
+  "vercel-post-build": "if [ \"$VERCEL_GITHUB_COMMIT_REF\" = \"main\" ]; then NODE_ENV=production node --inspect=0.0.0.0:9229 dist/app.js; else node dist/app.js; fi"
+}
   "author": "",
   "license": "ISC",
   "dependencies": {
